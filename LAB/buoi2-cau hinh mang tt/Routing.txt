@@ -1,0 +1,55 @@
+Static routing
+#HQ
+ip route 192.168.3.0 255.255.255.0 192.168.254.254
+ip route 192.168.10.0 255.255.255.0 192.168.254.254
+ip route 0.0.0.0 0.0.0.0 s0/2/0
+#BR
+ip route 192.168.1.0 255.255.255.0 s0/2/0
+ip route 192.168.2.0 255.255.255.0 s0/2/0
+ip route 0.0.0.0 0.0.0.0 8.8.8.8
+
+Dynamic routing
+#RIP
+#HQ
+router rip 
+version 2
+network 192.168.1.0
+network 192.168.2.0
+network 192.168.254.0
+passive-interface g0/0/0
+passive-interface g0/0/1
+#BR
+router rip 
+version 2
+network 192.168.10.0
+network 192.168.3.0
+network 192.168.254.0
+default-information originate
+passive-interface g0/0/0
+passive-interface g0/0/1
+passive-interface g0/1/1
+
+ip route 0.0.0.0 0.0.0.0 8.8.8.8
+
+OSPF
+#R1
+router osfp 1
+network 192.168.1.0 0.0.0.255 area 0
+network 192.168.2.0 0.0.0.255 area 0
+network 192.168.254.0 0.0.0.255 area 0
+passive-interface g0/0/0
+passive-interface g0/0/1
+#R2
+router ospf 1
+network 192.168.10.0 0.0.0.255 area 0
+network 192.168.3.0 0.0.0.255 area 0
+network 192.168.254.0 0.0.0.255 area 0
+default-information originate
+passive-interface g0/0/0
+passive-interface g0/0/1
+passive-interface g0/1/1
+
+
+ip route 0.0.0.0 0.0.0.0 g0/1/1
+
+#wildcard mask = 255.255.255.255 - subnet mask

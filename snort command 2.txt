@@ -1,0 +1,45 @@
+
+alert tcp any any -> $HOME_NET any (flags: S; msg:"Possible SYN DDoS"; flow: stateless; threshold: type both, track by_dst, count 100000, seconds 10; sid:10000001;rev:1;)
+alert tcp any  any -> $HOME_NET any (flags: A; msg:"Possible ACK DDoS"; flow: stateless; threshold: type both, track by_dst, count 100000, seconds 10; sid:10000002;rev:1;)
+alert tcp any  any -> $HOME_NET any (flags: R; msg:"Possible RST DDoS"; flow: stateless; threshold: type both, track by_dst, count 100000, seconds 10; sid:10000003;rev:1;)
+alert tcp any  any -> $HOME_NET any (flags: F; msg:"Possible FIN DDoS"; flow: stateless; threshold: type both, track by_dst, count 100000, seconds 10; sid:10000004;rev:1;)
+alert udp any  any -> $HOME_NET any (msg:"Possible UDP DDoS"; flow: stateless; threshold: type both, track by_dst, count 100000, seconds 10; sid:100005;rev:1;)
+alert icmp any  any -> $HOME_NET any (msg:"Possible ICMP DDoS"; threshold: type both, track by_dst, count 100000, seconds 10; sid:100006;rev:1;)
+
+
+
+drop tcp any any -> $HOME_NET 80 (flags: S; msg:"chan tan cong ddos tcp";flow:stateless; sid:10000001; detection_filter:track by_dst, count 20, seconds 3;)
+drop tcp any any -> $HOME_NET 80 (flags: A; msg:"chan tan cong ddos tcp";flow:stateless; sid:10000002; detection_filter:track by_dst, count 20, seconds 3;)
+drop tcp any any -> $HOME_NET 80 (flags: R; msg:"chan tan cong ddos tcp";flow:stateless; sid:10000003; detection_filter:track by_dst, count 20, seconds 3;)
+drop tcp any any -> $HOME_NET 80 (flags: F; msg:"chan tan cong ddos tcp";flow:stateless; sid:10000004; detection_filter:track by_dst, count 20, seconds 3;)
+
+
+===============================demo passive mode:======================
+
+cấu hình snort : snort -T -i ens38 -c /etc/snort/snort.conf
+console msg: snort -A console -q -u snort -g snort -c /etc/snort/snort.conf -i ens38
+ghi log : snort -l /var/log/snort/archived_log -K ascii -A console -q -u snort -g snort -c /etc/snort/snort.conf -i ens38 
+
+Tiến hành tấn công ddos
+attack hping3 :
+sudo hping3 192.168.231.2 -q -n -d 120 -S -p 80 --flood --rand-source --faster --c 2000
+
+bật rule thông báo bên snort
+
+các gói tin log bắt được là gói pcap
+thực hiện bắt log bằng snort
+
+xuất hiện rất nhiều file log
+
+
+
+
+=====================================demo inline mode:===========================
+
+cấu hình inline mode
+
+snort -T -c /etc/snort/snort.conf -i ens33:ens38 -Q 
+snort -c /etc/snort/snort.conf -i ens33:ens38 -Q -A console -q
+
+
+rule drop thực hiện theo thứ tự ưu tiên trước rule alert

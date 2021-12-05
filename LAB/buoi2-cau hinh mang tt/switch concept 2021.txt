@@ -1,0 +1,26 @@
+Switch L2
+-Tao VLAN
+vlan 10
+-Gan Interface vao VLAN
+int range f0/1 - 19
+switchport access vlan 10
+-switch <-> switch: trunk
+int g0/0/0
+swichport mode trunk
+
+Switch L3
+-Tao VLAN
+-switch <-> switch: trunk
+-enable chuc nang routing
+ip routing
+-Dat IP cho cac interface VLAN (default gateway cho PC)
+int vlan 10
+ip add 192.168.1.1 255.255.255.0
+-Doi voi interface ket noi router
+interface GigabitEthernet1/0/5
+ no switchport
+ ip address 192.168.254.1 255.255.255.0
+
+Routing
+Static: default route treen router, swwitch
+- static den 192.168.0.0/16 ->summarized network tren router.
